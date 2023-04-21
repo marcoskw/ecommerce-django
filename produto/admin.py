@@ -1,7 +1,20 @@
 from django.contrib import admin
 from . import models
 
-admin.site.register(models.Produto)
+
+class VariacaoInline(admin.TabularInline):
+    model = models.Variacao
+    extra = 1
+
+
+class ProdutoAdmin(admin.ModelAdmin):
+    inlines = [
+        VariacaoInline
+    ]
+
+
+admin.site.register(models.Produto, ProdutoAdmin)
 admin.site.register(models.Marca)
 admin.site.register(models.CategoriaSuperior)
 admin.site.register(models.CategoriaInferior)
+admin.site.register(models.Variacao)

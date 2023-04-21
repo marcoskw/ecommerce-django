@@ -17,12 +17,20 @@ class CategoriaSuperior(models.Model):
     def __str__(self):
         return self.nome_categoria_superior
 
+    class Meta:
+        verbose_name = 'Categoria Superior'
+        verbose_name_plural = 'Categorias Superiores'
+
 
 class CategoriaInferior(models.Model):
     nome_categoria_inferior = models.CharField(max_length=255)
 
     def __str__(self):
         return self.nome_categoria_inferior
+
+    class Meta:
+        verbose_name = 'Categoria Inferior'
+        verbose_name_plural = 'Categorias Inferiores'
 
 
 class Produto(models.Model):
@@ -79,3 +87,18 @@ class Produto(models.Model):
 
     def __str__(self):
         return self.nome_produto
+
+
+class Variacao(models.Model):
+    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    nome_variacao = models.CharField(max_length=255, blank=True, null=True)
+    preco = models.FloatField()
+    preco_promocional = models.FloatField(default=0)
+    estoque = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return self.nome_variacao or self.produto.nome_produto
+
+    class Meta:
+        verbose_name = 'Variação'
+        verbose_name_plural = 'Variações'
