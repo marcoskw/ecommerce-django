@@ -35,8 +35,6 @@ class CategoriaInferior(models.Model):
 
 class Produto(models.Model):
     nome_produto = models.CharField(max_length=255)
-    cod_barras = models.CharField(max_length=13)
-    referencia = models.CharField(max_length=50)
     nome_marca = models.ForeignKey(Marca, on_delete=models.DO_NOTHING)
     descricao_curta = models.TextField(max_length=255)
     descricao_longa = models.TextField(max_length=255)
@@ -91,6 +89,8 @@ class Produto(models.Model):
 
 class Variacao(models.Model):
     produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
+    referencia = models.CharField(max_length=50)
+    cod_barras = models.CharField(max_length=13)
     nome_variacao = models.CharField(max_length=255, blank=True, null=True)
     preco = models.FloatField()
     preco_promocional = models.FloatField(default=0)
