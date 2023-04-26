@@ -2,6 +2,7 @@ from django.conf import settings
 import os
 from PIL import Image
 from django.db import models
+from django.utils.text import slugify
 
 
 class Marca(models.Model):
@@ -23,6 +24,8 @@ class CategoriaSuperior(models.Model):
 
 
 class CategoriaInferior(models.Model):
+    categoria_superior = models.ForeignKey(
+        CategoriaSuperior, on_delete=models.CASCADE, blank=True, null=True)
     nome_categoria_inferior = models.CharField(max_length=255)
 
     def __str__(self):
@@ -35,7 +38,8 @@ class CategoriaInferior(models.Model):
 
 class Produto(models.Model):
     nome_produto = models.CharField(max_length=255)
-    nome_marca = models.ForeignKey(Marca, on_delete=models.DO_NOTHING)
+    nome_marca = models.ForeignKey(
+        Marca, on_delete=models.DO_NOTHING, verbose_name='Marca')
     descricao_curta = models.TextField(max_length=255)
     descricao_longa = models.TextField(max_length=255)
     categoria_superior = models.ForeignKey(
@@ -44,17 +48,26 @@ class Produto(models.Model):
         CategoriaInferior, on_delete=models.DO_NOTHING)
     imagem = models.ImageField(
         upload_to='produtos_imagens/%Y/%m/', blank=True, null=True)
-    slug = models.SlugField(unique=True)
-    preco_marketing = models.FloatField()
-    preco_marketing_promocional = models.FloatField(default=0)
+    slug = models.SlugField(unique=True, blank=True, null=True)
+    preco_marketing = models.FloatField(verbose_name='Preço')
+    preco_marketing_promocional = models.FloatField(
+        default=0, verbose_name='Preço Promo')
     tipo = models.CharField(
         default='V',
         max_length=1,
         choices=(
-            ('V', 'Variacao'),
+            ('V', 'Variável'),
             ('S', 'Simples'),
         )
     )
+
+    def get_preco_marketing_formatado(self):
+        return f'R$ {self.preco_marketing:.2f}'.replace('.', ',')
+    get_preco_marketing_formatado.short_description = 'Preço'
+
+    def get_preco_marketing_promocional_formatado(self):
+        return f'R$ {self.preco_marketing_promocional:.2f}'.replace('.', ',')
+    get_preco_marketing_promocional_formatado.short_description = 'Preço Promo'
 
     @staticmethod
     def resize_image(img, new_width=800):
@@ -76,6 +89,9 @@ class Produto(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        if not self.slug:
+            slug = f'{slugify(self.nome_produto)}'
+            self.slug = slug
         super().save(*args, **kwargs)
 
         max_image_size = 800
