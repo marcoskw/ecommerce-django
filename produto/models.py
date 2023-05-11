@@ -3,6 +3,7 @@ import os
 from PIL import Image
 from django.db import models
 from django.utils.text import slugify
+from utils import utils
 
 
 class Marca(models.Model):
@@ -62,11 +63,11 @@ class Produto(models.Model):
     )
 
     def get_preco_marketing_formatado(self):
-        return f'R$ {self.preco_marketing:.2f}'.replace('.', ',')
+        return utils.formatar_preco(self.preco_marketing)
     get_preco_marketing_formatado.short_description = 'Preço'
 
     def get_preco_marketing_promocional_formatado(self):
-        return f'R$ {self.preco_marketing_promocional:.2f}'.replace('.', ',')
+        return utils.formatar_preco(self.preco_marketing_promocional)
     get_preco_marketing_promocional_formatado.short_description = 'Preço Promo'
 
     @staticmethod
